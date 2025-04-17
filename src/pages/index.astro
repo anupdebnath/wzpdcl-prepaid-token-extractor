@@ -1,6 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import Footer from '../components/Footer.astro';
+import TokenModal from '../components/TokenModal.astro';
 ---
 
 <Layout title="WZPDCL Prepaid Token Extractor">
@@ -106,15 +107,28 @@ import Footer from '../components/Footer.astro';
     </div>
   </main>
   <Footer />
+  <TokenModal />
 </Layout>
 
 <script>
-  // Token extraction functionality
+  import { extractTokenInfo, formatTokenForCopy } from '../utils/tokenExtractor';
+  import { saveToken, getSavedTokens, deleteToken, clearAllTokens } from '../utils/tokenStorage';
+
   document.addEventListener('DOMContentLoaded', () => {
     const tokenMessage = document.getElementById('tokenMessage') as HTMLTextAreaElement;
     const copyAllButton = document.getElementById('copyAllButton') as HTMLButtonElement;
     const tokenDataDisplay = document.getElementById('tokenDataDisplay') as HTMLDivElement;
     const tokenPlaceholder = document.getElementById('tokenPlaceholder') as HTMLDivElement;
+
+    // Modal elements
+    const tokenModal = document.getElementById('tokenModal') as HTMLDivElement;
+    const openModalBtn = document.getElementById('openModalBtn') as HTMLButtonElement;
+    const closeModal = document.getElementById('closeModal') as HTMLButtonElement;
+    const clearAllTokensBtn = document.getElementById('clearAllTokens') as HTMLButtonElement;
+    const savedTokensListModal = document.getElementById('savedTokensListModal') as HTMLDivElement;
+    const noSavedTokensModal = document.getElementById('noSavedTokensModal') as HTMLDivElement;
+    const tokenCountBadge = document.getElementById('tokenCountBadge') as HTMLSpanElement;
+    const tokenButtonTooltip = document.getElementById('tokenButtonTooltip') as HTMLDivElement;
 
     // Elements for displaying token data
     const prepaidToken = document.getElementById('prepaidToken') as HTMLPreElement;
@@ -139,137 +153,187 @@ import Footer from '../components/Footer.astro';
     const vatContainer = document.getElementById('vatContainer') as HTMLDivElement;
     const rebateContainer = document.getElementById('rebateContainer') as HTMLDivElement;
 
-    // Function to extract token information
-    const extractTokenInfo = () => {
-      const message = tokenMessage.value;
-      if (!message) {
+    // Current token data and tracking variables
+    let currentTokenData: any = null;
+    let lastSavedToken: string | null = null;
+
+    // Function to update the UI with token data
+    const updateTokenUI = (tokenData: any) => {
+      if (!tokenData) {
         tokenDataDisplay.classList.add('hidden');
         tokenPlaceholder.classList.remove('hidden');
         copyAllButton.classList.add('hidden');
         return;
       }
 
-      const tokenData: Record<string, string> = {};
+      // Display the token data
+      prepaidToken.textContent = tokenData.prepaidtoken;
+      sequenceNumber.textContent = tokenData.sequencenumber || 'Not found';
+      meterNumber.textContent = tokenData.meternumber || 'Not found';
 
-      const regexPatterns = {
-        prepaidtoken: /Token is ((?:\d{4}-\d{4}-\d{4}-\d{4}-\d{4},?)+)/,
-        sequencenumber: /SeqNo:([\d=]+)/,
-        meternumber: /for Meter No:(\d+)/,
-        vendingamount: /Vending Amt:(\d+\.\d+)/,
-        energycost: /Enrg Cost(\d+\.\d+)/,
-        totalcharge: /Total Charge:(\d+\.\d+)/,
-        meterrent: /Meter Rent 1P:(\d+)/,
-        demandcharge: /Demand Charge:(\d+)/,
-        vat: /VAT:(\d+\.\d+)/,
-        rebate: /Rebate:(-\d+\.\d+)/
-      };
-
-      for (const [key, regex] of Object.entries(regexPatterns)) {
-        const match = message.match(regex);
-        if (match) {
-          tokenData[key] = match[1];
-        }
+      // Handle optional fields
+      if (tokenData.vendingamount) {
+        vendingAmount.textContent = tokenData.vendingamount;
+        vendingAmountContainer.classList.remove('hidden');
+      } else {
+        vendingAmountContainer.classList.add('hidden');
       }
 
-      // Only show the token data if we have at least the token
-      if (tokenData['prepaidtoken']) {
-        // Format the token with line breaks instead of commas
-        // Some SMS messages have multiple tokens separated by commas
-        tokenData['prepaidtoken'] = tokenData['prepaidtoken'].replace(/,/g, '\n');
-
-        // Display the token data
-        prepaidToken.textContent = tokenData['prepaidtoken'];
-        sequenceNumber.textContent = tokenData['sequencenumber'] || 'Not found';
-        meterNumber.textContent = tokenData['meternumber'] || 'Not found';
-
-        // Handle optional fields
-        if (tokenData['vendingamount']) {
-          vendingAmount.textContent = tokenData['vendingamount'];
-          vendingAmountContainer.classList.remove('hidden');
-        } else {
-          vendingAmountContainer.classList.add('hidden');
-        }
-
-        if (tokenData['energycost']) {
-          energyCost.textContent = tokenData['energycost'];
-          energyCostContainer.classList.remove('hidden');
-        } else {
-          energyCostContainer.classList.add('hidden');
-        }
-
-        if (tokenData['totalcharge']) {
-          totalCharge.textContent = tokenData['totalcharge'];
-          totalChargeContainer.classList.remove('hidden');
-        } else {
-          totalChargeContainer.classList.add('hidden');
-        }
-
-        if (tokenData['meterrent']) {
-          meterRent.textContent = tokenData['meterrent'];
-          meterRentContainer.classList.remove('hidden');
-        } else {
-          meterRentContainer.classList.add('hidden');
-        }
-
-        if (tokenData['demandcharge']) {
-          demandCharge.textContent = tokenData['demandcharge'];
-          demandChargeContainer.classList.remove('hidden');
-        } else {
-          demandChargeContainer.classList.add('hidden');
-        }
-
-        if (tokenData['vat']) {
-          vat.textContent = tokenData['vat'];
-          vatContainer.classList.remove('hidden');
-        } else {
-          vatContainer.classList.add('hidden');
-        }
-
-        if (tokenData['rebate']) {
-          rebate.textContent = tokenData['rebate'];
-          rebateContainer.classList.remove('hidden');
-        } else {
-          rebateContainer.classList.add('hidden');
-        }
-
-        // Show the token data display and copy button, hide placeholder
-        tokenDataDisplay.classList.remove('hidden');
-        tokenPlaceholder.classList.add('hidden');
-        copyAllButton.classList.remove('hidden');
+      if (tokenData.energycost) {
+        energyCost.textContent = tokenData.energycost;
+        energyCostContainer.classList.remove('hidden');
       } else {
-        // Hide the token data display and copy button if no token is found, show placeholder
-        tokenDataDisplay.classList.add('hidden');
-        tokenPlaceholder.classList.remove('hidden');
-        copyAllButton.classList.add('hidden');
+        energyCostContainer.classList.add('hidden');
+      }
+
+      if (tokenData.totalcharge) {
+        totalCharge.textContent = tokenData.totalcharge;
+        totalChargeContainer.classList.remove('hidden');
+      } else {
+        totalChargeContainer.classList.add('hidden');
+      }
+
+      if (tokenData.meterrent) {
+        meterRent.textContent = tokenData.meterrent;
+        meterRentContainer.classList.remove('hidden');
+      } else {
+        meterRentContainer.classList.add('hidden');
+      }
+
+      if (tokenData.demandcharge) {
+        demandCharge.textContent = tokenData.demandcharge;
+        demandChargeContainer.classList.remove('hidden');
+      } else {
+        demandChargeContainer.classList.add('hidden');
+      }
+
+      if (tokenData.vat) {
+        vat.textContent = tokenData.vat;
+        vatContainer.classList.remove('hidden');
+      } else {
+        vatContainer.classList.add('hidden');
+      }
+
+      if (tokenData.rebate) {
+        rebate.textContent = tokenData.rebate;
+        rebateContainer.classList.remove('hidden');
+      } else {
+        rebateContainer.classList.add('hidden');
+      }
+
+      // Show the token data display and buttons, hide placeholder
+      tokenDataDisplay.classList.remove('hidden');
+      tokenPlaceholder.classList.add('hidden');
+      copyAllButton.classList.remove('hidden');
+
+      // Auto-save the token if it's new
+      const tokenKey = `${tokenData.prepaidtoken}-${tokenData.meternumber || ''}`;
+      if (tokenKey !== lastSavedToken && tokenData.prepaidtoken) {
+        const savedToken = saveToken(tokenData);
+        if (savedToken) {
+          lastSavedToken = tokenKey;
+
+          // Update the modal list
+          renderSavedTokensModal();
+        }
       }
     };
 
-    // Add event listener for real-time extraction
-    tokenMessage.addEventListener('input', extractTokenInfo);
+    // Function to process token message
+    const processTokenMessage = () => {
+      const message = tokenMessage.value;
+      currentTokenData = extractTokenInfo(message);
+      updateTokenUI(currentTokenData);
+    };
 
-    // No longer using the Copy Token functionality as we've combined it with Copy Essential Info
+    // Function to render saved tokens in the modal
+    const renderSavedTokensModal = () => {
+      const savedTokens = getSavedTokens();
+
+      // Update the badge count
+      if (savedTokens.length > 0) {
+        tokenCountBadge.textContent = savedTokens.length > 99 ? '99+' : savedTokens.length.toString();
+        tokenCountBadge.classList.remove('hidden');
+        tokenCountBadge.classList.add('flex');
+      } else {
+        tokenCountBadge.classList.add('hidden');
+        tokenCountBadge.classList.remove('flex');
+      }
+
+      if (savedTokens.length === 0) {
+        noSavedTokensModal.classList.remove('hidden');
+        savedTokensListModal.innerHTML = '';
+        return;
+      }
+
+      noSavedTokensModal.classList.add('hidden');
+      savedTokensListModal.innerHTML = '';
+
+      // Sort tokens by date, newest first
+      savedTokens.sort((a, b) => b.savedAt - a.savedAt);
+
+      savedTokens.forEach(token => {
+        const tokenElement = document.createElement('div');
+        tokenElement.className = 'bg-white p-3 rounded-lg border border-gray-200 mb-3';
+
+        const date = new Date(token.savedAt);
+        const formattedDate = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+
+        tokenElement.innerHTML = `
+          <div class="flex justify-between items-start mb-2">
+            <div>
+              <h3 class="text-sm font-semibold text-gray-700">Meter: ${token.meternumber || 'Unknown'}</h3>
+              <p class="text-xs text-gray-500">${formattedDate}</p>
+            </div>
+            <div class="flex space-x-2">
+              <button class="load-token-btn text-xs px-2 py-1 bg-indigo-500 text-white rounded hover:bg-indigo-600" data-id="${token.id}">Load</button>
+              <button class="delete-token-btn text-xs px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600" data-id="${token.id}">Delete</button>
+            </div>
+          </div>
+          <div class="text-sm font-mono bg-gray-50 p-2 rounded border border-gray-200 overflow-x-auto whitespace-pre-wrap">${token.originalMessage ? token.originalMessage.trim() : 'No message data'}</div>
+        `;
+
+        savedTokensListModal.appendChild(tokenElement);
+      });
+
+      // Add event listeners to the load and delete buttons
+      document.querySelectorAll('.load-token-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const id = (e.currentTarget as HTMLButtonElement).getAttribute('data-id');
+          const token = savedTokens.find(t => t.id === id);
+          if (token) {
+            // Close the modal
+            tokenModal.classList.add('hidden');
+
+            // Set the original message in the textarea
+            tokenMessage.value = token.originalMessage ? token.originalMessage.trim() : '';
+
+            // Process the token
+            currentTokenData = token;
+            updateTokenUI(token);
+          }
+        });
+      });
+
+      document.querySelectorAll('.delete-token-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const id = (e.currentTarget as HTMLButtonElement).getAttribute('data-id');
+          if (id) {
+            deleteToken(id);
+            renderSavedTokensModal();
+          }
+        });
+      });
+    };
+
+    // Add event listener for real-time extraction
+    tokenMessage.addEventListener('input', processTokenMessage);
 
     // Copy token and essential information functionality
     copyAllButton.addEventListener('click', () => {
-      // Format the token and essential information in a clean, shareable format
-      let allInfo = 'Token Information\n';
+      if (!currentTokenData) return;
 
-      // Add token
-      if (prepaidToken.textContent) {
-        allInfo += 'WZPDCL Prepaid Token:\n' + prepaidToken.textContent + '\n\n';
-      }
-
-      // Add sequence number
-      if (sequenceNumber.textContent) {
-        allInfo += 'Sequence Number: ' + sequenceNumber.textContent + '\n';
-      }
-
-      // Add meter number
-      if (meterNumber.textContent) {
-        allInfo += 'Meter Number: ' + meterNumber.textContent + '\n';
-      }
-
-      // We're not including any of the optional financial details as per user request
+      const allInfo = formatTokenForCopy(currentTokenData);
 
       // Copy to clipboard
       navigator.clipboard.writeText(allInfo)
@@ -290,5 +354,53 @@ import Footer from '../components/Footer.astro';
           console.error('Could not copy text: ', err);
         });
     });
+
+    // Modal functionality
+    openModalBtn.addEventListener('click', () => {
+      renderSavedTokensModal();
+      tokenModal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
+    });
+
+    closeModal.addEventListener('click', () => {
+      tokenModal.classList.add('hidden');
+      document.body.style.overflow = ''; // Re-enable scrolling
+    });
+
+    // Close modal when clicking outside of it
+    tokenModal.addEventListener('click', (e) => {
+      if (e.target === tokenModal) {
+        tokenModal.classList.add('hidden');
+        document.body.style.overflow = '';
+      }
+    });
+
+    // Tooltip functionality
+    openModalBtn.addEventListener('mouseenter', () => {
+      tokenButtonTooltip.classList.add('opacity-100');
+    });
+
+    openModalBtn.addEventListener('mouseleave', () => {
+      tokenButtonTooltip.classList.remove('opacity-100');
+    });
+
+    // For touch devices
+    openModalBtn.addEventListener('touchstart', () => {
+      tokenButtonTooltip.classList.add('opacity-100');
+      setTimeout(() => {
+        tokenButtonTooltip.classList.remove('opacity-100');
+      }, 1500);
+    });
+
+    // Clear all tokens
+    clearAllTokensBtn.addEventListener('click', () => {
+      if (confirm('Are you sure you want to delete all saved tokens? This action cannot be undone.')) {
+        clearAllTokens();
+        renderSavedTokensModal();
+      }
+    });
+
+    // Initialize
+    renderSavedTokensModal();
   });
 </script>

@@ -5,11 +5,41 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --color-primary: #4F46E5; /* indigo-600 */
+  --color-primary-hover: #4338CA; /* indigo-700 */
+  --color-secondary: #3B82F6; /* blue-500 */
+  --color-secondary-hover: #2563EB; /* blue-600 */
+  --color-success: #10B981; /* green-500 */
+  --color-success-hover: #059669; /* green-600 */
+  --color-background: #F3F4F6; /* gray-100 */
+  --color-text: #1F2937; /* gray-800 */
+  --color-text-light: #6B7280; /* gray-500 */
+}
+
 /* Additional global styles */
 html {
   font-family: 'Open Sans', sans-serif;
+  color: var(--color-text);
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Rajdhani', sans-serif;
+}
+
+/* Custom utility classes */
+.btn {
+  @apply px-4 py-2 rounded-md transition-colors focus:outline-none;
+}
+
+.btn-primary {
+  @apply bg-indigo-600 text-white hover:bg-indigo-700 focus:ring-2 focus:ring-indigo-200;
+}
+
+.btn-secondary {
+  @apply bg-blue-500 text-white hover:bg-blue-600 focus:ring-2 focus:ring-blue-200;
+}
+
+.btn-success {
+  @apply bg-green-500 text-white hover:bg-green-600 focus:ring-2 focus:ring-green-200;
 }

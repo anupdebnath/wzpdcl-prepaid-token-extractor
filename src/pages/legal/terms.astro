@@ -1,0 +1,51 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Footer from '../../components/Footer.astro';
+---
+
+<Layout title="Terms of Use | WZPDCL Prepaid Token Extractor">
+  <main class="flex items-start justify-center p-2 sm:p-4 pt-8 sm:pt-16">
+    <div class="container max-w-4xl mx-auto px-3 sm:px-6 py-5 sm:py-8 bg-white shadow-lg rounded-lg">
+        <a href="/" class="inline-flex items-center text-indigo-600 hover:text-indigo-800 mb-6">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+          </svg>
+          Back to Home
+        </a>
+
+        <div class="p-2">
+          <h1 class="text-2xl sm:text-3xl font-bold mb-6 text-indigo-700">Terms of Use</h1>
+
+          <div class="prose max-w-none">
+            <p class="mb-4">Last Updated: {new Date().toLocaleDateString()}</p>
+
+            <h2 class="text-xl font-semibold mt-6 mb-3">Acceptance of Terms</h2>
+            <p>By accessing or using the WZPDCL Prepaid Token Extractor application, you agree to be bound by these Terms of Use. If you do not agree to these terms, please do not use the application.</p>
+
+            <h2 class="text-xl font-semibold mt-6 mb-3">Description of Service</h2>
+            <p>The WZPDCL Prepaid Token Extractor is a web application designed to extract and format prepaid token information from WZPDCL SMS messages. The application processes the text locally in your browser and does not transmit any data to external servers.</p>
+
+            <h2 class="text-xl font-semibold mt-6 mb-3">Use of the Service</h2>
+            <p>You agree to use the WZPDCL Prepaid Token Extractor only for its intended purpose and in compliance with all applicable laws and regulations. You are responsible for ensuring that the SMS messages you paste into the application are your own or that you have permission to use them.</p>
+
+            <h2 class="text-xl font-semibold mt-6 mb-3">Intellectual Property</h2>
+            <p>The WZPDCL Prepaid Token Extractor application, including its code, design, and content, is available as open-source software. You may view, fork, and contribute to the code on <a href="https://github.com/anupdebnath/wzpdcl-prepaid-token-extractor" class="text-indigo-600 hover:text-indigo-800" target="_blank" rel="noopener noreferrer">GitHub</a>.</p>
+
+            <h2 class="text-xl font-semibold mt-6 mb-3">Disclaimer of Warranties</h2>
+            <p>The WZPDCL Prepaid Token Extractor is provided "as is" and "as available" without any warranties of any kind, either express or implied. We do not guarantee that the application will be error-free or uninterrupted, or that any defects will be corrected.</p>
+
+            <h2 class="text-xl font-semibold mt-6 mb-3">Limitation of Liability</h2>
+            <p>In no event shall the creators or contributors of the WZPDCL Prepaid Token Extractor be liable for any indirect, incidental, special, consequential, or punitive damages, including without limitation, loss of profits, data, use, goodwill, or other intangible losses, resulting from your access to or use of or inability to access or use the application.</p>
+
+            <h2 class="text-xl font-semibold mt-6 mb-3">Changes to Terms</h2>
+            <p>We reserve the right to modify these Terms of Use at any time. We will notify you of any changes by posting the new Terms of Use on this page and updating the "Last Updated" date.</p>
+
+            <h2 class="text-xl font-semibold mt-6 mb-3">Contact Us</h2>
+            <p>If you have any questions about these Terms of Use, please contact the developer via the <a href="https://github.com/anupdebnath/wzpdcl-prepaid-token-extractor" class="text-indigo-600 hover:text-indigo-800" target="_blank" rel="noopener noreferrer">GitHub repository</a>.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <Footer />
+</Layout>

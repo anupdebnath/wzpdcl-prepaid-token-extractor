@@ -1,0 +1,48 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import Footer from '../../components/Footer.astro';
+---
+
+<Layout title="Privacy Policy | WZPDCL Prepaid Token Extractor">
+  <main class="flex items-start justify-center p-2 sm:p-4 pt-8 sm:pt-16">
+    <div class="container max-w-4xl mx-auto px-3 sm:px-6 py-5 sm:py-8 bg-white shadow-lg rounded-lg">
+      <a href="/" class="inline-flex items-center text-indigo-600 hover:text-indigo-800 mb-6">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+          </svg>
+          Back to Home
+        </a>
+
+        <div class="p-2">
+          <h1 class="text-2xl sm:text-3xl font-bold mb-6 text-indigo-700">Privacy Policy</h1>
+
+          <div class="prose max-w-none">
+            <p class="mb-4">Last Updated: {new Date().toLocaleDateString()}</p>
+
+            <h2 class="text-xl font-semibold mt-6 mb-3">Introduction</h2>
+            <p>Welcome to the WZPDCL Prepaid Token Extractor. This Privacy Policy explains how we handle your information when you use our application.</p>
+
+            <h2 class="text-xl font-semibold mt-6 mb-3">Information We Don't Collect</h2>
+            <p>Our application is designed with privacy in mind:</p>
+            <ul class="list-disc pl-6 mb-4">
+              <li>We do not collect, store, or transmit any personal information.</li>
+              <li>All token extraction happens locally in your browser.</li>
+              <li>We do not use cookies or any other tracking technologies.</li>
+              <li>We do not have access to the SMS messages you paste into the application.</li>
+            </ul>
+
+            <h2 class="text-xl font-semibold mt-6 mb-3">Third-Party Services</h2>
+            <p>While we don't collect any data, your internet service provider or hosting provider may collect certain technical information as part of their service operation.</p>
+
+            <h2 class="text-xl font-semibold mt-6 mb-3">Changes to This Privacy Policy</h2>
+            <p>We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last Updated" date.</p>
+
+            <h2 class="text-xl font-semibold mt-6 mb-3">Contact Us</h2>
+            <p>If you have any questions about this Privacy Policy, please contact the developer via the <a href="https://github.com/anupdebnath/wzpdcl-prepaid-token-extractor" class="text-indigo-600 hover:text-indigo-800" target="_blank" rel="noopener noreferrer">GitHub repository</a>.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <Footer />
+</Layout>

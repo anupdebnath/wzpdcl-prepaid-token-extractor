@@ -3,89 +3,107 @@ import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout title="WZPDCL Prepaid Token Extractor">
-  <main class="flex items-center justify-center min-h-screen p-4">
-    <div class="container max-w-3xl mx-auto px-6 py-10 bg-white shadow-lg rounded-lg">
-      <h1 class="text-3xl md:text-4xl font-bold mb-4 text-indigo-700">WZPDCL Prepaid Token Extractor</h1>
-      <p class="text-gray-700 mb-6">Beautify WZPDCL Prepaid Token SMS.</p>
+  <main class="flex items-start justify-center min-h-screen p-2 sm:p-4 pt-8 sm:pt-16">
+    <div class="container max-w-4xl mx-auto px-3 sm:px-6 py-5 sm:py-8 bg-white shadow-lg rounded-lg">
+      <!-- Two-column layout for desktop, single column for mobile -->
+      <div class="flex flex-col lg:flex-row lg:space-x-6">
+        <!-- Left column: Input section -->
+        <div class="lg:w-1/2 mb-4 lg:mb-0">
+          <h1 class="text-2xl sm:text-3xl font-bold mb-2 text-indigo-700">WZPDCL Prepaid Token Extractor</h1>
+          <p class="text-gray-700 mb-4 text-sm">Beautify WZPDCL Prepaid Token SMS.</p>
 
-      <div class="mb-6">
-        <textarea
-          id="tokenMessage"
-          class="w-full mt-1 p-3 rounded-md border border-gray-300 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
-          rows="4"
-          placeholder="Paste your WZPDCL token SMS here..."
-        ></textarea>
-      </div>
-
-      <div class="flex flex-col sm:flex-row justify-start space-y-2 sm:space-y-0 sm:space-x-2">
-        <button
-          id="copyButton"
-          class="w-full sm:w-auto px-6 py-3 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:bg-gray-300 transition-colors hidden"
-        >
-          Copy Token
-        </button>
-        <button
-          id="copyAllButton"
-          class="w-full sm:w-auto px-6 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600 transition-colors hidden"
-        >
-          Copy Essential Info
-        </button>
-      </div>
-
-      <!-- Display extracted token data -->
-      <div id="tokenDataDisplay" class="mt-8 hidden">
-        <h2 class="text-xl font-bold mb-4 text-indigo-600">Token Information</h2>
-
-        <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
           <div class="mb-4">
-            <h3 class="text-sm font-semibold text-gray-500 mb-1">WZPDCL Prepaid Token:</h3>
-            <pre id="prepaidToken" class="bg-white p-3 rounded border border-gray-200 text-lg font-mono"></pre>
+            <textarea
+              id="tokenMessage"
+              class="w-full mt-1 p-3 rounded-md border border-gray-300 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+              rows="5"
+              placeholder="Paste your WZPDCL token SMS here..."
+            ></textarea>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <h3 class="text-sm font-semibold text-gray-500 mb-1">Sequence Number:</h3>
-              <p id="sequenceNumber" class="bg-white p-2 rounded border border-gray-200"></p>
-            </div>
+          <div class="flex flex-row justify-start space-x-2">
+            <button
+              id="copyButton"
+              class="w-auto px-4 py-2 text-sm bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 focus:outline-none focus:bg-gray-300 transition-colors hidden"
+            >
+              Copy Token
+            </button>
+            <button
+              id="copyAllButton"
+              class="w-auto px-4 py-2 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600 transition-colors hidden"
+            >
+              Copy Essential Info
+            </button>
+          </div>
+        </div>
 
-            <div>
-              <h3 class="text-sm font-semibold text-gray-500 mb-1">Meter Number:</h3>
-              <p id="meterNumber" class="bg-white p-2 rounded border border-gray-200"></p>
-            </div>
+        <!-- Right column: Output section -->
+        <div class="lg:w-1/2">
+          <!-- Placeholder when no token data is available -->
+          <div id="tokenPlaceholder" class="min-h-[300px] flex flex-col items-center justify-center p-6 bg-gray-50 rounded-lg border border-gray-200 text-center">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-gray-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <h3 class="text-lg font-semibold text-gray-500 mb-2">No Token Data</h3>
+            <p class="text-gray-400 text-sm">Paste your WZPDCL SMS in the input field to extract token information</p>
+          </div>
 
-            <div id="vendingAmountContainer" class="hidden">
-              <h3 class="text-sm font-semibold text-gray-500 mb-1">Vending Amount:</h3>
-              <p id="vendingAmount" class="bg-white p-2 rounded border border-gray-200"></p>
-            </div>
+          <!-- Display extracted token data -->
+          <div id="tokenDataDisplay" class="hidden min-h-[300px]">
+            <h2 class="text-xl font-bold mb-3 text-indigo-600">Token Information</h2>
 
-            <div id="energyCostContainer" class="hidden">
-              <h3 class="text-sm font-semibold text-gray-500 mb-1">Energy Cost:</h3>
-              <p id="energyCost" class="bg-white p-2 rounded border border-gray-200"></p>
-            </div>
+            <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
+              <div class="mb-3">
+                <h3 class="text-sm font-semibold text-gray-500 mb-1">WZPDCL Prepaid Token:</h3>
+                <pre id="prepaidToken" class="bg-white p-2 rounded border border-gray-200 text-base font-mono overflow-x-auto"></pre>
+              </div>
 
-            <div id="totalChargeContainer" class="hidden">
-              <h3 class="text-sm font-semibold text-gray-500 mb-1">Total Charge:</h3>
-              <p id="totalCharge" class="bg-white p-2 rounded border border-gray-200"></p>
-            </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <h3 class="text-sm font-semibold text-gray-500 mb-1">Sequence Number:</h3>
+                  <p id="sequenceNumber" class="bg-white p-2 rounded border border-gray-200 text-sm"></p>
+                </div>
 
-            <div id="meterRentContainer" class="hidden">
-              <h3 class="text-sm font-semibold text-gray-500 mb-1">Meter Rent:</h3>
-              <p id="meterRent" class="bg-white p-2 rounded border border-gray-200"></p>
-            </div>
+                <div>
+                  <h3 class="text-sm font-semibold text-gray-500 mb-1">Meter Number:</h3>
+                  <p id="meterNumber" class="bg-white p-2 rounded border border-gray-200 text-sm"></p>
+                </div>
 
-            <div id="demandChargeContainer" class="hidden">
-              <h3 class="text-sm font-semibold text-gray-500 mb-1">Demand Charge:</h3>
-              <p id="demandCharge" class="bg-white p-2 rounded border border-gray-200"></p>
-            </div>
+                <div id="vendingAmountContainer" class="hidden">
+                  <h3 class="text-sm font-semibold text-gray-500 mb-1">Vending Amount:</h3>
+                  <p id="vendingAmount" class="bg-white p-2 rounded border border-gray-200 text-sm"></p>
+                </div>
 
-            <div id="vatContainer" class="hidden">
-              <h3 class="text-sm font-semibold text-gray-500 mb-1">VAT:</h3>
-              <p id="vat" class="bg-white p-2 rounded border border-gray-200"></p>
-            </div>
+                <div id="energyCostContainer" class="hidden">
+                  <h3 class="text-sm font-semibold text-gray-500 mb-1">Energy Cost:</h3>
+                  <p id="energyCost" class="bg-white p-2 rounded border border-gray-200 text-sm"></p>
+                </div>
 
-            <div id="rebateContainer" class="hidden">
-              <h3 class="text-sm font-semibold text-gray-500 mb-1">Rebate:</h3>
-              <p id="rebate" class="bg-white p-2 rounded border border-gray-200"></p>
+                <div id="totalChargeContainer" class="hidden">
+                  <h3 class="text-sm font-semibold text-gray-500 mb-1">Total Charge:</h3>
+                  <p id="totalCharge" class="bg-white p-2 rounded border border-gray-200 text-sm"></p>
+                </div>
+
+                <div id="meterRentContainer" class="hidden">
+                  <h3 class="text-sm font-semibold text-gray-500 mb-1">Meter Rent:</h3>
+                  <p id="meterRent" class="bg-white p-2 rounded border border-gray-200 text-sm"></p>
+                </div>
+
+                <div id="demandChargeContainer" class="hidden">
+                  <h3 class="text-sm font-semibold text-gray-500 mb-1">Demand Charge:</h3>
+                  <p id="demandCharge" class="bg-white p-2 rounded border border-gray-200 text-sm"></p>
+                </div>
+
+                <div id="vatContainer" class="hidden">
+                  <h3 class="text-sm font-semibold text-gray-500 mb-1">VAT:</h3>
+                  <p id="vat" class="bg-white p-2 rounded border border-gray-200 text-sm"></p>
+                </div>
+
+                <div id="rebateContainer" class="hidden">
+                  <h3 class="text-sm font-semibold text-gray-500 mb-1">Rebate:</h3>
+                  <p id="rebate" class="bg-white p-2 rounded border border-gray-200 text-sm"></p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -101,6 +119,7 @@ import Layout from '../layouts/Layout.astro';
     const copyButton = document.getElementById('copyButton') as HTMLButtonElement;
     const copyAllButton = document.getElementById('copyAllButton') as HTMLButtonElement;
     const tokenDataDisplay = document.getElementById('tokenDataDisplay') as HTMLDivElement;
+    const tokenPlaceholder = document.getElementById('tokenPlaceholder') as HTMLDivElement;
 
     // Elements for displaying token data
     const prepaidToken = document.getElementById('prepaidToken') as HTMLPreElement;
@@ -130,6 +149,7 @@ import Layout from '../layouts/Layout.astro';
       const message = tokenMessage.value;
       if (!message) {
         tokenDataDisplay.classList.add('hidden');
+        tokenPlaceholder.classList.remove('hidden');
         copyButton.classList.add('hidden');
         copyAllButton.classList.add('hidden');
         return;
@@ -218,13 +238,15 @@ import Layout from '../layouts/Layout.astro';
           rebateContainer.classList.add('hidden');
         }
 
-        // Show the token data display and copy buttons
+        // Show the token data display and copy buttons, hide placeholder
         tokenDataDisplay.classList.remove('hidden');
+        tokenPlaceholder.classList.add('hidden');
         copyButton.classList.remove('hidden');
         copyAllButton.classList.remove('hidden');
       } else {
-        // Hide the token data display and copy buttons if no token is found
+        // Hide the token data display and copy buttons if no token is found, show placeholder
         tokenDataDisplay.classList.add('hidden');
+        tokenPlaceholder.classList.remove('hidden');
         copyButton.classList.add('hidden');
         copyAllButton.classList.add('hidden');
       }

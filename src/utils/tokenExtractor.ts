@@ -9,7 +9,7 @@ export interface TokenData {
   demandcharge?: string;
   vat?: string;
   rebate?: string;
-  originalMessage?: string; // Store the original SMS message
+  originalMessage?: string;
 }
 
 export function extractTokenInfo(message: string): TokenData | null {
@@ -18,7 +18,7 @@ export function extractTokenInfo(message: string): TokenData | null {
   }
 
   const tokenData: TokenData = {
-    originalMessage: message.trim() // Store the original message, trimmed of whitespace
+    originalMessage: message.trim()
   };
 
   const regexPatterns = {
@@ -41,10 +41,7 @@ export function extractTokenInfo(message: string): TokenData | null {
     }
   }
 
-  // Only return the token data if we have at least the token
   if (tokenData.prepaidtoken) {
-    // Format the token with line breaks instead of commas
-    // Some SMS messages have multiple tokens separated by commas
     tokenData.prepaidtoken = tokenData.prepaidtoken.replace(/,/g, '\n');
     return tokenData;
   }
@@ -55,17 +52,14 @@ export function extractTokenInfo(message: string): TokenData | null {
 export function formatTokenForCopy(tokenData: TokenData): string {
   let formattedText = 'Token Information\n';
 
-  // Add token
   if (tokenData.prepaidtoken) {
     formattedText += 'WZPDCL Prepaid Token:\n' + tokenData.prepaidtoken + '\n\n';
   }
 
-  // Add sequence number
   if (tokenData.sequencenumber) {
     formattedText += 'Sequence Number: ' + tokenData.sequencenumber + '\n';
   }
 
-  // Add meter number
   if (tokenData.meternumber) {
     formattedText += 'Meter Number: ' + tokenData.meternumber + '\n';
   }

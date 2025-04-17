@@ -12,14 +12,12 @@ export function saveToken(tokenData: TokenData): SavedToken | null {
     return null;
   }
 
-  // Check if this token already exists
   const savedTokens = getSavedTokens();
   const tokenExists = savedTokens.some(token =>
     token.prepaidtoken === tokenData.prepaidtoken &&
     token.meternumber === tokenData.meternumber
   );
 
-  // If token already exists, don't save it again
   if (tokenExists) {
     return null;
   }
@@ -55,7 +53,7 @@ export function deleteToken(id: string): boolean {
   const filteredTokens = savedTokens.filter(token => token.id !== id);
 
   if (filteredTokens.length === savedTokens.length) {
-    return false; // Token not found
+    return false;
   }
 
   localStorage.setItem(STORAGE_KEY, JSON.stringify(filteredTokens));

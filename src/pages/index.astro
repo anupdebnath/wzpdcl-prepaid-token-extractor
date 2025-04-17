@@ -23,13 +23,45 @@ import TokenModal from '../components/TokenModal.astro';
             ></textarea>
           </div>
 
-          <div class="flex flex-row justify-start space-x-2">
+          <div class="flex flex-row justify-start space-x-2 flex-wrap">
             <button
               id="copyAllButton"
-              class="w-auto px-4 py-2 text-sm bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600 transition-colors hidden"
+              class="w-auto px-4 py-2 text-sm bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-green-500"
+              disabled
             >
-              Copy Token and Info
+              Copy Token
             </button>
+
+            <!-- Clear button -->
+            <button
+              id="clearButton"
+              class="w-auto px-4 py-2 text-sm bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none focus:bg-red-600 transition-colors"
+            >
+              <span class="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </span>
+            </button>
+
+            <!-- View Saved Tokens button -->
+            <div class="relative">
+              <button
+                id="openModalBtn"
+                class="relative w-auto px-4 py-2 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                </svg>
+                <!-- Badge showing number of saved tokens -->
+                <span id="tokenCountBadge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 items-center justify-center hidden">0</span>
+              </button>
+
+              <!-- Tooltip -->
+              <div class="absolute bottom-full right-0 mb-2 bg-gray-800 text-white text-xs rounded py-1 px-2 pointer-events-none opacity-0 transition-opacity duration-300 whitespace-nowrap" id="tokenButtonTooltip">
+                View Saved Tokens
+              </div>
+            </div>
           </div>
         </div>
 
@@ -120,7 +152,6 @@ import TokenModal from '../components/TokenModal.astro';
     const tokenDataDisplay = document.getElementById('tokenDataDisplay') as HTMLDivElement;
     const tokenPlaceholder = document.getElementById('tokenPlaceholder') as HTMLDivElement;
 
-    // Modal elements
     const tokenModal = document.getElementById('tokenModal') as HTMLDivElement;
     const openModalBtn = document.getElementById('openModalBtn') as HTMLButtonElement;
     const closeModal = document.getElementById('closeModal') as HTMLButtonElement;
@@ -130,12 +161,10 @@ import TokenModal from '../components/TokenModal.astro';
     const tokenCountBadge = document.getElementById('tokenCountBadge') as HTMLSpanElement;
     const tokenButtonTooltip = document.getElementById('tokenButtonTooltip') as HTMLDivElement;
 
-    // Elements for displaying token data
     const prepaidToken = document.getElementById('prepaidToken') as HTMLPreElement;
     const sequenceNumber = document.getElementById('sequenceNumber') as HTMLParagraphElement;
     const meterNumber = document.getElementById('meterNumber') as HTMLParagraphElement;
 
-    // Optional elements
     const vendingAmount = document.getElementById('vendingAmount') as HTMLParagraphElement;
     const energyCost = document.getElementById('energyCost') as HTMLParagraphElement;
     const totalCharge = document.getElementById('totalCharge') as HTMLParagraphElement;
@@ -144,7 +173,6 @@ import TokenModal from '../components/TokenModal.astro';
     const vat = document.getElementById('vat') as HTMLParagraphElement;
     const rebate = document.getElementById('rebate') as HTMLParagraphElement;
 
-    // Containers for optional elements
     const vendingAmountContainer = document.getElementById('vendingAmountContainer') as HTMLDivElement;
     const energyCostContainer = document.getElementById('energyCostContainer') as HTMLDivElement;
     const totalChargeContainer = document.getElementById('totalChargeContainer') as HTMLDivElement;
@@ -153,25 +181,23 @@ import TokenModal from '../components/TokenModal.astro';
     const vatContainer = document.getElementById('vatContainer') as HTMLDivElement;
     const rebateContainer = document.getElementById('rebateContainer') as HTMLDivElement;
 
-    // Current token data and tracking variables
     let currentTokenData: any = null;
     let lastSavedToken: string | null = null;
 
-    // Function to update the UI with token data
     const updateTokenUI = (tokenData: any) => {
       if (!tokenData) {
         tokenDataDisplay.classList.add('hidden');
         tokenPlaceholder.classList.remove('hidden');
-        copyAllButton.classList.add('hidden');
+        copyAllButton.disabled = true;
         return;
       }
 
-      // Display the token data
       prepaidToken.textContent = tokenData.prepaidtoken;
       sequenceNumber.textContent = tokenData.sequencenumber || 'Not found';
       meterNumber.textContent = tokenData.meternumber || 'Not found';
 
-      // Handle optional fields
+      copyAllButton.disabled = false;
+
       if (tokenData.vendingamount) {
         vendingAmount.textContent = tokenData.vendingamount;
         vendingAmountContainer.classList.remove('hidden');
@@ -221,36 +247,29 @@ import TokenModal from '../components/TokenModal.astro';
         rebateContainer.classList.add('hidden');
       }
 
-      // Show the token data display and buttons, hide placeholder
       tokenDataDisplay.classList.remove('hidden');
       tokenPlaceholder.classList.add('hidden');
-      copyAllButton.classList.remove('hidden');
 
-      // Auto-save the token if it's new
       const tokenKey = `${tokenData.prepaidtoken}-${tokenData.meternumber || ''}`;
       if (tokenKey !== lastSavedToken && tokenData.prepaidtoken) {
         const savedToken = saveToken(tokenData);
         if (savedToken) {
           lastSavedToken = tokenKey;
 
-          // Update the modal list
           renderSavedTokensModal();
         }
       }
     };
 
-    // Function to process token message
     const processTokenMessage = () => {
       const message = tokenMessage.value;
       currentTokenData = extractTokenInfo(message);
       updateTokenUI(currentTokenData);
     };
 
-    // Function to render saved tokens in the modal
     const renderSavedTokensModal = () => {
       const savedTokens = getSavedTokens();
 
-      // Update the badge count
       if (savedTokens.length > 0) {
         tokenCountBadge.textContent = savedTokens.length > 99 ? '99+' : savedTokens.length.toString();
         tokenCountBadge.classList.remove('hidden');
@@ -269,7 +288,6 @@ import TokenModal from '../components/TokenModal.astro';
       noSavedTokensModal.classList.add('hidden');
       savedTokensListModal.innerHTML = '';
 
-      // Sort tokens by date, newest first
       savedTokens.sort((a, b) => b.savedAt - a.savedAt);
 
       savedTokens.forEach(token => {
@@ -296,19 +314,18 @@ import TokenModal from '../components/TokenModal.astro';
         savedTokensListModal.appendChild(tokenElement);
       });
 
-      // Add event listeners to the load and delete buttons
       document.querySelectorAll('.load-token-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
           const id = (e.currentTarget as HTMLButtonElement).getAttribute('data-id');
           const token = savedTokens.find(t => t.id === id);
           if (token) {
-            // Close the modal
+
             tokenModal.classList.add('hidden');
 
-            // Set the original message in the textarea
+
             tokenMessage.value = token.originalMessage ? token.originalMessage.trim() : '';
 
-            // Process the token
+
             currentTokenData = token;
             updateTokenUI(token);
           }
@@ -326,19 +343,15 @@ import TokenModal from '../components/TokenModal.astro';
       });
     };
 
-    // Add event listener for real-time extraction
     tokenMessage.addEventListener('input', processTokenMessage);
 
-    // Copy token and essential information functionality
     copyAllButton.addEventListener('click', () => {
       if (!currentTokenData) return;
 
       const allInfo = formatTokenForCopy(currentTokenData);
 
-      // Copy to clipboard
       navigator.clipboard.writeText(allInfo)
         .then(() => {
-          // Show success feedback
           const originalText = copyAllButton.textContent;
           copyAllButton.textContent = 'Copied!';
           copyAllButton.classList.remove('bg-blue-500', 'hover:bg-blue-600');
@@ -355,7 +368,6 @@ import TokenModal from '../components/TokenModal.astro';
         });
     });
 
-    // Modal functionality
     openModalBtn.addEventListener('click', () => {
       renderSavedTokensModal();
       tokenModal.classList.remove('hidden');
@@ -367,7 +379,6 @@ import TokenModal from '../components/TokenModal.astro';
       document.body.style.overflow = ''; // Re-enable scrolling
     });
 
-    // Close modal when clicking outside of it
     tokenModal.addEventListener('click', (e) => {
       if (e.target === tokenModal) {
         tokenModal.classList.add('hidden');
@@ -375,7 +386,6 @@ import TokenModal from '../components/TokenModal.astro';
       }
     });
 
-    // Tooltip functionality
     openModalBtn.addEventListener('mouseenter', () => {
       tokenButtonTooltip.classList.add('opacity-100');
     });
@@ -384,7 +394,6 @@ import TokenModal from '../components/TokenModal.astro';
       tokenButtonTooltip.classList.remove('opacity-100');
     });
 
-    // For touch devices
     openModalBtn.addEventListener('touchstart', () => {
       tokenButtonTooltip.classList.add('opacity-100');
       setTimeout(() => {
@@ -392,7 +401,6 @@ import TokenModal from '../components/TokenModal.astro';
       }, 1500);
     });
 
-    // Clear all tokens
     clearAllTokensBtn.addEventListener('click', () => {
       if (confirm('Are you sure you want to delete all saved tokens? This action cannot be undone.')) {
         clearAllTokens();
@@ -400,7 +408,17 @@ import TokenModal from '../components/TokenModal.astro';
       }
     });
 
-    // Initialize
+    const clearButton = document.getElementById('clearButton') as HTMLButtonElement;
+    clearButton.addEventListener('click', () => {
+      tokenMessage.value = '';
+
+      tokenDataDisplay.classList.add('hidden');
+      tokenPlaceholder.classList.remove('hidden');
+      copyAllButton.disabled = true;
+
+      currentTokenData = null;
+    });
+
     renderSavedTokensModal();
   });
 </script>

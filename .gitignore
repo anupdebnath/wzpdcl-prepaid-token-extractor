@@ -28,3 +28,7 @@ coverage
 *.sw?
 
 *.tsbuildinfo
+.augment-guidelines
+
+# Astro auto-generated files
+.astro

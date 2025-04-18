@@ -1,4 +1,6 @@
 ---
+import MdiClose from '~icons/mdi/close';
+import MdiDelete from '~icons/mdi/delete';
 ---
 
 <div id="tokenModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center hidden">
@@ -6,9 +8,7 @@
     <div class="flex justify-between items-center p-6 border-b">
       <h3 class="text-xl font-semibold text-indigo-700">Saved Tokens</h3>
       <button id="closeModal" class="text-gray-500 hover:text-gray-700">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>
+        <MdiClose class="text-xl" />
       </button>
     </div>
     <div class="p-6 overflow-y-auto flex-grow">
@@ -20,8 +20,8 @@
       </div>
     </div>
     <div class="border-t p-6 flex justify-end">
-      <button id="clearAllTokens" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 text-sm">
-        Clear All Tokens
+      <button id="clearAllTokens" class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 text-sm flex items-center">
+        <MdiDelete class="mr-2 text-xl" /> Clear All Tokens
       </button>
     </div>
   </div>

@@ -3,7 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import Footer from '../components/Footer.astro';
 import TokenModal from '../components/TokenModal.astro';
 import MdiDelete from '~icons/mdi/delete';
-import MdiReceipt from '~icons/mdi/receipt';
+import MdiInvoiceList from '~icons/mdi/invoice-list';
 import MdiFileDocumentOutline from '~icons/mdi/file-document-outline';
 ---
 
@@ -29,7 +29,7 @@ import MdiFileDocumentOutline from '~icons/mdi/file-document-outline';
           <div class="flex flex-row justify-start space-x-2 flex-wrap">
             <button
               id="copyAllButton"
-              class="w-auto px-4 py-2 text-sm bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:bg-green-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-green-500"
+              class="w-auto px-4 py-2 text-sm bg-green-500 text-white rounded-md hover:bg-green-600 focus:outline-none focus:bg-green-600 transition-colors disabled:bg-gray-500 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-gray-700"
               disabled
             >
               Copy Token
@@ -51,7 +51,7 @@ import MdiFileDocumentOutline from '~icons/mdi/file-document-outline';
                 id="openModalBtn"
                 class="relative w-auto px-4 py-2 text-sm bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
               >
-                <MdiReceipt class="text-xl" />
+                <MdiInvoiceList class="text-xl" />
                 <!-- Badge showing number of saved tokens -->
                 <span id="tokenCountBadge" class="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 items-center justify-center hidden">0</span>
               </button>
